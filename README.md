@@ -28,6 +28,7 @@ Currently supported packages:
 | **OpenLiteSpeed**         | [Github: oqs-demos/openlitespeed](openlitespeed)       | [ Dockerhub: openquantumsafe/openlitespeed](https://hub.docker.com/repository/docker/openquantumsafe/openlitespeed)                       |
 | **Unbound**         | [Github: oqs-demos/unbound](unbound)       | [ Dockerhub: openquantumsafe/unbound](https://hub.docker.com/repository/docker/openquantumsafe/unbound)                       |
 | **Envoy**         | [Github: oqs-demos/envoy](unbound)       | [ Dockerhub: openquantumsafe/envoy](https://hub.docker.com/repository/docker/openquantumsafe/envoy)                       |
+| **nghttpx**         | [Github: oqs-demos/nghttpx](nghttpx)       | [ Dockerhub: openquantumsafe/nghttpx](https://hub.docker.com/repository/docker/openquantumsafe/nghttpx)                       |
 
 You can use the openssl (s_client), curl, Chromium and GNOME Web/epiphany clients with the Open Quantum Safe test server at https://test.openquantumsafe.org/.
 

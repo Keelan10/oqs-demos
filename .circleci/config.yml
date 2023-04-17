@@ -508,6 +508,44 @@ jobs:
                   docker tag envoy-oqs $TARGETNAME/envoy:latest &&
                   docker push $TARGETNAME/envoy:latest 
 
+  ubuntu_x64_nghttpx:
+    description: Building and pushing OQS-enabled nghttpx
+    docker:
+      - image: openquantumsafe/ci-ubuntu-focal-x86_64:latest
+        auth:
+          username: $DOCKER_LOGIN
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+      - setup_remote_docker
+      - run:
+          name: Authenticate to Docker
+          command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+      - run:
+          name: Build OQS nghttpx
+          command: |
+            docker build -t oqs-nghttpx .
+          working_directory: nghttpx
+      - run:
+          name: Test OQS nghttpx TLS servers using built OQS nghttpx
+          command: |
+            docker network create nghttpx-test &&
+            docker run --network nghttpx-test --detach --rm --name oqs-nginx openquantumsafe/nginx &&
+            docker run --network nghttpx-test --detach --rm --name oqs-nghttpx nghttpx sh -c "nghttpx /certs/server.key /certs/server.crt -f '*,4433;' -b 'oqs-nginx,8080' --ecdh-curves kyber512 --no-ocsp" &&
+            docker run --network nghttpx-test --rm openquantumsafe/curl curl -k -s https://oqs-nghttpx:4433 &&
+            docker stop oqs-nginx oqs-nghttpx
+      - when:
+          condition:
+            or:
+              - equal: [ main, << pipeline.git.branch >> ]
+              - equal: [ true, << pipeline.parameters.new_openssl_commit >> ]
+          steps:
+            - run:
+                name: Push nghttpx image
+                command: |
+                  docker tag oqs-nghttpx $TARGETNAME/nghttpx:latest &&
+                  docker push $TARGETNAME/nghttpx:latest
+
 workflows:
   version: 2.1
   build:
@@ -539,3 +577,5 @@ workflows:
       # Disable as it takes too long on OQS CCI plan
       #- ubuntu_x64_envoy:
       #    context: openquantumsafe
+      - ubuntu_x64_nghttpx:
+          context: openquantumsafe
